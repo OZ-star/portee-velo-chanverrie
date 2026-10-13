@@ -238,7 +238,7 @@ document.getElementById("replier").addEventListener("click", e => {
   // ---------- Carte ----------
   const carte = L.map("carte", { zoomControl: false, minZoom: 9, zoomSnap: 0.25 });
   L.control.zoom({ position: "topright" }).addTo(carte);
-  L.tileLayer("https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image/png&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}",
+  L.tileLayer("https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&TILEMATRIXSET=PM_0_19&FORMAT=image/png&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}",
     { maxZoom: 19, attribution: "Fond © IGN | Routes et pistes cyclables © contributeurs OpenStreetMap" }).addTo(carte);
   for (const [nom, z] of [["chaleur", 350], ["reseau", 355], ["iso", 360], ["trace", 450]]) {
     const p = carte.createPane(nom); p.style.zIndex = z; if (nom !== "trace") p.style.pointerEvents = "none";
@@ -279,7 +279,7 @@ document.getElementById("replier").addEventListener("click", e => {
   // bandes en tirets
   const reseau = L.layerGroup().addTo(carte);
   {
-    const rendu = L.canvas({ pane: "reseau", padding: 0.3 });
+    const rendu = L.canvas({ pane: "reseau", padding: 0.3 }).addTo(carte);
     // [pistes, bandes, itinéraires sur route] ; les itinéraires = classe 2 issue des bases des collectivités
     // (« aucun aménagement » : jalonnés sur chaussée partagée), pas les routes OSM ordinaires
     const segments = [[], [], []];
@@ -291,9 +291,9 @@ document.getElementById("replier").addEventListener("click", e => {
         segments[c].push([[P.lat[P.a[e]], P.lon[P.a[e]]], [P.lat[P.b[e]], P.lon[P.b[e]]]]);
     }
     const style = { renderer: rendu, interactive: false, lineCap: "round", lineJoin: "round" };
-    L.polyline(segments[0], { ...style, color: "#fff", weight: 1.2, opacity: .6 }).addTo(reseau);
-    L.polyline(segments[1], { ...style, color: "#fff", weight: 1, opacity: .45, dashArray: "2 3" }).addTo(reseau);
-    L.polyline(segments[2], { ...style, color: "#fff", weight: 1, opacity: .45, dashArray: "1 4" }).addTo(reseau);
+    if (segments[0].length) L.polyline(segments[0], { ...style, color: "#fff", weight: 1.2, opacity: .6 }).addTo(reseau);
+    if (segments[1].length) L.polyline(segments[1], { ...style, color: "#fff", weight: 1, opacity: .45, dashArray: "2 3" }).addTo(reseau);
+    if (segments[2].length) L.polyline(segments[2], { ...style, color: "#fff", weight: 1, opacity: .45, dashArray: "1 4" }).addTo(reseau);
   }
   $("#voir-reseau").addEventListener("change", ev => {
     if (ev.target.checked) reseau.addTo(carte); else reseau.remove();
@@ -576,3 +576,4 @@ document.getElementById("replier").addEventListener("click", e => {
 </script>
 </body>
 </html>
+
